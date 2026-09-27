@@ -32,14 +32,15 @@ Begin WebPage WebPage1
    _ImplicitInstance=   False
    _mDesignHeight  =   0
    _mDesignWidth   =   0
+   _mName          =   ""
    _mPanelIndex    =   -1
    Begin WebFlexLayoutManager ContainerLayout
-      CrossAxisAlignment=   3
       BorderColor     =   &c000000FF
       BorderThickness =   1
       ControlCount    =   0
       ControlID       =   ""
       CornerSize      =   -1
+      CrossAxisAlignment=   3
       CSSClasses      =   ""
       Direction       =   1
       Enabled         =   True
@@ -49,7 +50,6 @@ Begin WebPage WebPage1
       Height          =   580
       Index           =   -2147483648
       Indicator       =   ""
-      MainAxisAlignment=   0
       LayoutDirection =   "LayoutDirections.LeftToRight"
       LayoutType      =   "LayoutTypes.Fixed"
       Left            =   0
@@ -60,6 +60,7 @@ Begin WebPage WebPage1
       LockRight       =   True
       LockTop         =   True
       LockVertical    =   False
+      MainAxisAlignment=   0
       PaddingBottom   =   10
       PaddingLeft     =   10
       PaddingRight    =   10
@@ -76,12 +77,12 @@ Begin WebPage WebPage1
       _mDesignWidth   =   0
       _mPanelIndex    =   -1
       Begin WebFlexLayoutManager FlexManager3
-         CrossAxisAlignment=   2
          BorderColor     =   &c000000FF
          BorderThickness =   1
          ControlCount    =   0
          ControlID       =   ""
          CornerSize      =   -1
+         CrossAxisAlignment=   2
          CSSClasses      =   ""
          Direction       =   1
          Enabled         =   True
@@ -91,7 +92,6 @@ Begin WebPage WebPage1
          Height          =   276
          Index           =   -2147483648
          Indicator       =   ""
-         MainAxisAlignment=   5
          LayoutDirection =   "LayoutDirections.LeftToRight"
          LayoutType      =   "LayoutTypes.Fixed"
          Left            =   40
@@ -102,6 +102,7 @@ Begin WebPage WebPage1
          LockRight       =   False
          LockTop         =   True
          LockVertical    =   False
+         MainAxisAlignment=   5
          PaddingBottom   =   10
          PaddingLeft     =   10
          PaddingRight    =   10
@@ -235,12 +236,12 @@ Begin WebPage WebPage1
          End
       End
       Begin WebFlexLayoutManager FlexManager1
-         CrossAxisAlignment=   2
          BorderColor     =   &c000000FF
          BorderThickness =   1
          ControlCount    =   0
          ControlID       =   ""
          CornerSize      =   -1
+         CrossAxisAlignment=   2
          CSSClasses      =   ""
          Cursor          =   "0"
          Direction       =   0
@@ -252,7 +253,6 @@ Begin WebPage WebPage1
          Index           =   -2147483648
          Indicator       =   0
          InitialParent   =   "ContainerLayout"
-         MainAxisAlignment=   5
          LayoutDirection =   "LayoutDirections.LeftToRight"
          LayoutType      =   "LayoutTypes.Fixed"
          Left            =   40
@@ -263,6 +263,7 @@ Begin WebPage WebPage1
          LockRight       =   True
          LockTop         =   True
          LockVertical    =   False
+         MainAxisAlignment=   5
          PaddingBottom   =   10
          PaddingLeft     =   30
          PaddingRight    =   30
@@ -490,12 +491,12 @@ Begin WebPage WebPage1
          End
       End
       Begin WebFlexLayoutManager FlexManager2
-         CrossAxisAlignment=   2
          BorderColor     =   &c000000FF
          BorderThickness =   1
          ControlCount    =   0
          ControlID       =   ""
          CornerSize      =   -1
+         CrossAxisAlignment=   2
          CSSClasses      =   ""
          Cursor          =   "0"
          Direction       =   0
@@ -507,7 +508,6 @@ Begin WebPage WebPage1
          Index           =   -2147483648
          Indicator       =   0
          InitialParent   =   "ContainerLayout"
-         MainAxisAlignment=   5
          LayoutDirection =   "LayoutDirections.LeftToRight"
          LayoutType      =   "LayoutTypes.Fixed"
          Left            =   40
@@ -518,6 +518,7 @@ Begin WebPage WebPage1
          LockRight       =   True
          LockTop         =   True
          LockVertical    =   False
+         MainAxisAlignment=   5
          PaddingBottom   =   10
          PaddingLeft     =   30
          PaddingRight    =   30
@@ -744,67 +745,25 @@ Begin WebPage WebPage1
             _mPanelIndex    =   -1
          End
       End
-   End
-   Begin WebFlexLayoutManager FlexManager4
-      CrossAxisAlignment=   2
-      BorderColor     =   &c000000FF
-      BorderThickness =   1
-      ControlCount    =   0
-      ControlID       =   ""
-      CornerSize      =   -1
-      CSSClasses      =   ""
-      Direction       =   0
-      Enabled         =   True
-      FillColor       =   &cFFFFFF
-      Gap             =   10
-      HasFillColor    =   False
-      Height          =   233
-      Index           =   -2147483648
-      Indicator       =   0
-      MainAxisAlignment=   5
-      LayoutDirection =   "LayoutDirections.LeftToRight"
-      LayoutType      =   "LayoutTypes.Fixed"
-      Left            =   500
-      LockBottom      =   False
-      LockedInPosition=   False
-      LockHorizontal  =   False
-      LockLeft        =   True
-      LockRight       =   False
-      LockTop         =   True
-      LockVertical    =   False
-      PaddingBottom   =   10
-      PaddingLeft     =   10
-      PaddingRight    =   10
-      PaddingTop      =   10
-      PanelIndex      =   0
-      Parent          =   "nil"
-      Scope           =   0
-      TabIndex        =   16
-      TabPanelIndex   =   0
-      TabStop         =   True
-      Tooltip         =   ""
-      Top             =   219
-      Visible         =   True
-      Width           =   412
-      _mDesignHeight  =   0
-      _mDesignWidth   =   0
-      _mPanelIndex    =   -1
-      Begin WebRectangle Rect4
+      Begin WebFlexLayoutManager FlexManager4
          BorderColor     =   &c000000FF
          BorderThickness =   1
          ControlCount    =   0
          ControlID       =   ""
          CornerSize      =   -1
+         CrossAxisAlignment=   2
          CSSClasses      =   ""
+         Direction       =   0
          Enabled         =   True
-         FillColor       =   &cFFFB0000
-         HasFillColor    =   True
-         Height          =   57
+         FillColor       =   &cFFFFFF
+         Gap             =   10
+         HasFillColor    =   False
+         Height          =   233
          Index           =   -2147483648
          Indicator       =   0
          LayoutDirection =   "LayoutDirections.LeftToRight"
          LayoutType      =   "LayoutTypes.Fixed"
-         Left            =   521
+         Left            =   500
          LockBottom      =   False
          LockedInPosition=   False
          LockHorizontal  =   False
@@ -812,93 +771,135 @@ Begin WebPage WebPage1
          LockRight       =   False
          LockTop         =   True
          LockVertical    =   False
+         MainAxisAlignment=   5
+         PaddingBottom   =   10
+         PaddingLeft     =   10
+         PaddingRight    =   10
+         PaddingTop      =   10
          PanelIndex      =   0
-         Parent          =   "FlexManager4"
+         Parent          =   "ContainerLayout"
          Scope           =   0
-         TabIndex        =   21
-         TabPanelIndex   =   -1
+         TabIndex        =   17
+         TabPanelIndex   =   0
          TabStop         =   True
          Tooltip         =   ""
-         Top             =   239
+         Top             =   218
          Visible         =   True
-         Width           =   277
+         Width           =   412
          _mDesignHeight  =   0
          _mDesignWidth   =   0
          _mPanelIndex    =   -1
-      End
-      Begin WebRectangle Rect5
-         BorderColor     =   &c000000FF
-         BorderThickness =   1
-         ControlCount    =   0
-         ControlID       =   ""
-         CornerSize      =   -1
-         CSSClasses      =   ""
-         Enabled         =   True
-         FillColor       =   &cFF85FF00
-         HasFillColor    =   True
-         Height          =   57
-         Index           =   -2147483648
-         Indicator       =   0
-         LayoutDirection =   "LayoutDirections.LeftToRight"
-         LayoutType      =   "LayoutTypes.Fixed"
-         Left            =   521
-         LockBottom      =   False
-         LockedInPosition=   False
-         LockHorizontal  =   False
-         LockLeft        =   True
-         LockRight       =   False
-         LockTop         =   True
-         LockVertical    =   False
-         PanelIndex      =   0
-         Parent          =   "FlexManager4"
-         Scope           =   0
-         TabIndex        =   22
-         TabPanelIndex   =   -1
-         TabStop         =   True
-         Tooltip         =   ""
-         Top             =   304
-         Visible         =   True
-         Width           =   277
-         _mDesignHeight  =   0
-         _mDesignWidth   =   0
-         _mPanelIndex    =   -1
-      End
-      Begin WebRectangle Rect6
-         BorderColor     =   &c000000FF
-         BorderThickness =   1
-         ControlCount    =   0
-         ControlID       =   ""
-         CornerSize      =   -1
-         CSSClasses      =   ""
-         Enabled         =   True
-         FillColor       =   &c01199300
-         HasFillColor    =   True
-         Height          =   57
-         Index           =   -2147483648
-         Indicator       =   0
-         LayoutDirection =   "LayoutDirections.LeftToRight"
-         LayoutType      =   "LayoutTypes.Fixed"
-         Left            =   521
-         LockBottom      =   False
-         LockedInPosition=   False
-         LockHorizontal  =   False
-         LockLeft        =   True
-         LockRight       =   False
-         LockTop         =   True
-         LockVertical    =   False
-         PanelIndex      =   0
-         Parent          =   "FlexManager4"
-         Scope           =   0
-         TabIndex        =   23
-         TabPanelIndex   =   -1
-         TabStop         =   True
-         Tooltip         =   ""
-         Top             =   369
-         Visible         =   True
-         Width           =   277
-         _mDesignHeight  =   0
-         _mDesignWidth   =   0
-         _mPanelIndex    =   -1
+         Begin WebRectangle Rect4
+            BorderColor     =   &c000000FF
+            BorderThickness =   1
+            ControlCount    =   0
+            ControlID       =   ""
+            CornerSize      =   -1
+            CSSClasses      =   ""
+            Enabled         =   True
+            FillColor       =   &cFFFB0000
+            HasFillColor    =   True
+            Height          =   57
+            Index           =   -2147483648
+            Indicator       =   0
+            LayoutDirection =   "LayoutDirections.LeftToRight"
+            LayoutType      =   "LayoutTypes.Fixed"
+            Left            =   521
+            LockBottom      =   False
+            LockedInPosition=   False
+            LockHorizontal  =   False
+            LockLeft        =   True
+            LockRight       =   False
+            LockTop         =   True
+            LockVertical    =   False
+            PanelIndex      =   0
+            Parent          =   "FlexManager4"
+            Scope           =   0
+            TabIndex        =   21
+            TabPanelIndex   =   -1
+            TabStop         =   True
+            Tooltip         =   ""
+            Top             =   238
+            Visible         =   True
+            Width           =   277
+            _mDesignHeight  =   0
+            _mDesignWidth   =   0
+            _mPanelIndex    =   -1
+         End
+         Begin WebRectangle Rect5
+            BorderColor     =   &c000000FF
+            BorderThickness =   1
+            ControlCount    =   0
+            ControlID       =   ""
+            CornerSize      =   -1
+            CSSClasses      =   ""
+            Enabled         =   True
+            FillColor       =   &cFF85FF00
+            HasFillColor    =   True
+            Height          =   57
+            Index           =   -2147483648
+            Indicator       =   0
+            LayoutDirection =   "LayoutDirections.LeftToRight"
+            LayoutType      =   "LayoutTypes.Fixed"
+            Left            =   521
+            LockBottom      =   False
+            LockedInPosition=   False
+            LockHorizontal  =   False
+            LockLeft        =   True
+            LockRight       =   False
+            LockTop         =   True
+            LockVertical    =   False
+            PanelIndex      =   0
+            Parent          =   "FlexManager4"
+            Scope           =   0
+            TabIndex        =   22
+            TabPanelIndex   =   -1
+            TabStop         =   True
+            Tooltip         =   ""
+            Top             =   303
+            Visible         =   True
+            Width           =   277
+            _mDesignHeight  =   0
+            _mDesignWidth   =   0
+            _mPanelIndex    =   -1
+         End
+         Begin WebRectangle Rect6
+            BorderColor     =   &c000000FF
+            BorderThickness =   1
+            ControlCount    =   0
+            ControlID       =   ""
+            CornerSize      =   -1
+            CSSClasses      =   ""
+            Enabled         =   True
+            FillColor       =   &c01199300
+            HasFillColor    =   True
+            Height          =   57
+            Index           =   -2147483648
+            Indicator       =   0
+            LayoutDirection =   "LayoutDirections.LeftToRight"
+            LayoutType      =   "LayoutTypes.Fixed"
+            Left            =   521
+            LockBottom      =   False
+            LockedInPosition=   False
+            LockHorizontal  =   False
+            LockLeft        =   True
+            LockRight       =   False
+            LockTop         =   True
+            LockVertical    =   False
+            PanelIndex      =   0
+            Parent          =   "FlexManager4"
+            Scope           =   0
+            TabIndex        =   23
+            TabPanelIndex   =   -1
+            TabStop         =   True
+            Tooltip         =   ""
+            Top             =   368
+            Visible         =   True
+            Width           =   277
+            _mDesignHeight  =   0
+            _mDesignWidth   =   0
+            _mPanelIndex    =   -1
+         End
       End
    End
 End
