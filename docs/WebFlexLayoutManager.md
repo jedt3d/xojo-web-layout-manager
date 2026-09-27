@@ -170,6 +170,8 @@ To have the manager position a control, use `AddControl()`. You provide the cont
 
 ## 3. Flow Chart: Layout Algorithm (`ApplyLayout`)
 
+> **v1.2.0:** steps 1–5 below describe v1.1.0. Since v1.2.0 `ApplyLayout` maps its settings (and the basis sizes) to `DSFlexConfig` / `DSFlexItem`, calls `DSFlexEngine.Arrange` and applies the returned local rectangles. The results are the same as below except for rounding (`Floor(x + 0.5)`) and overflow handling; see `docs/spec.yaml` › `layout_algorithm`.
+
 The core of the `WebFlexLayoutManager` is the `ApplyLayout()` method. The flowchart below explains the internal algorithm used to position and size the managed controls.
 
 ```mermaid

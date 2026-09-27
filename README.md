@@ -6,9 +6,9 @@ The main idea behind `WebFlexLayoutManager` is to allow Xojo Web UI controls to 
 
 ## Features
 
-- **Flexbox-like Algorithm**: Implements a subset of CSS Flexbox logic directly in Xojo code.
+- **Flexbox-like Algorithm**: Implements a subset of CSS Flexbox logic in pure Xojo code. Since 1.2.0 the arithmetic lives in `DSFlexEngine` (`DSCore/`), shared with the Desktop version.
 - **Direction Support**: Arrange controls in a `Row` (horizontal) or `Column` (vertical).
-- **Justify Content (Main Axis)**: Support for `FlexStart`, `FlexEnd`, `Center`, `SpaceBetween`, `SpaceAround`, and `Stretch`.
+- **Justify Content (Main Axis)**: Support for `FlexStart`, `FlexEnd`, `Center`, `SpaceBetween`, `SpaceAround`, `Stretch` and `SpaceEvenly`.
 - **Align Items (Cross Axis)**: Support for `FlexStart`, `FlexEnd`, `Center`, and `Stretch`.
 - **Flex Grow**: Controls can be assigned a grow factor (via `AddControl(control, growFactor)` or `SetFlexGrow(control, factor)`) to proportionally share remaining available space.
 - **Spacing Control**: Define a specific pixel `Gap` between items.
@@ -21,7 +21,7 @@ The main idea behind `WebFlexLayoutManager` is to allow Xojo Web UI controls to 
 - **Flex Wrap**: Support wrapping controls to a new line/column when they exceed the available container space.
 - **Align Self**: Allow individual controls to override the container's `AlignItems` property.
 - **Nested Layouts Support**: Improve support and testing for placing `WebFlexLayoutManager` instances inside other `WebFlexLayoutManager` instances.
-- **Max/Min Constraints**: Respect minimum and maximum width/height constraints of managed controls during layout calculation.
+- **Max/Min Constraints**: `DSFlexEngine` already supports `MinMain` / `MaxMain` and `FlexFit.Loose` per item; the class does not expose them yet (a `SetChildParams`-style method would).
 
 ## Changelog & Implementation Notes
 
@@ -40,6 +40,10 @@ The main idea behind `WebFlexLayoutManager` is to allow Xojo Web UI controls to 
 ### Flex Grow Precision
 **Problem**: Distributing fractional remaining space among multiple growing controls could leave empty gaps due to integer rounding.
 **Solution**: Implemented a floating-point calculation `Round((grow / totalFlexGrow) * remainingSpace)` to minimize rounding errors during distribution.
+
+### DSFlexEngine (1.2.0)
+**Problem**: The Desktop and Web classes each had their own copy of the layout arithmetic, and the copies had drifted (for example SpaceBetween dropped `Gap` on overflow here but not on Desktop). `Round` ties also depend on the server OS.
+**Solution**: `ApplyLayout()` now maps its settings to `DSFlexConfig` / `DSFlexItem`, calls `DSFlexEngine.Arrange` (the layout engine of the Clinic DS specification §8.5, `DSCore/`) and applies the results. Edges are rounded with `Floor(x + 0.5)`; overflowing content starts at the padding instead of negative positions; `JustifyContent.SpaceEvenly` (value 6) was added. Public API and the flex-basis behaviour are unchanged. See `docs/spec.yaml` › `layout_algorithm` for the full list of behaviour changes.
 
 ### Flex Basis — Grow Factor 0 Size Corruption Fix
 **Problem**: When the first control in a container had `growFactor = 0` and subsequent controls had `growFactor > 0`, the layout rendered sizes incorrectly. This occurred because `AddControl()` calls `ApplyLayout()` after each addition. When only grow=0 controls existed, the `Justify = Stretch` path would inflate them to fill the entire container. On subsequent `AddControl()` calls that introduced grow>0 controls, the inflated size was read back as the "fixed" space, consuming all available room and leaving grow>0 controls with zero size. This bug manifested regardless of whether the container direction was Row or Column.

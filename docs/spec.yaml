@@ -1,6 +1,7 @@
 name: FlexLayoutManager
 description: A layout manager class that implements a subset of CSS Flexbox for UI controls.
 target_platform: Xojo Web (ported from Xojo Desktop)
+version: 1.2.0
 
 enums:
   FlexDirection:
@@ -33,7 +34,10 @@ enums:
         description: "Items are evenly distributed in the line with equal space around them."
       - name: Stretch
         value: 5
-        description: "Items are stretched to fit the container along the main axis evenly (when FlexGrow is not applied)."
+        description: "Items are stretched to fit the container along the main axis evenly (when FlexGrow is not applied). Implemented as flex factor 1 on every item."
+      - name: SpaceEvenly
+        value: 6
+        description: "Equal space before, between and after the items (added in 1.2.0; value appended so saved Inspector values keep their meaning)."
         
   AlignItems:
     description: "Defines the default behavior for how flex items are laid out along the cross axis on the current line."
@@ -108,37 +112,16 @@ methods:
     description: "Calculates positions and sizes for all visible managed controls and applies them."
 
 layout_algorithm:
-  step_1_gather_metrics:
-    - "Iterate through ManagedControls to collect visible controls."
-    - "Sum up the total FlexGrow factor from all visible controls."
-    - "Calculate `totalFixedSpace`: the sum of widths (for Row) or heights (for Column) of controls with a grow factor of 0."
-  
-  step_2_calculate_available_space:
-    - "`availableMainSpace` = Container Size (Width/Height) minus Padding (Left/Right or Top/Bottom)"
-    - "`availableCrossSpace` = Container Size (Height/Width) minus Padding (Top/Bottom or Left/Right)"
-    - "`totalGapSpace` = (Number of visible controls - 1) * Gap"
-    - "`remainingSpace` = `availableMainSpace` - `totalFixedSpace` - `totalGapSpace` (Clamped to minimum 0)"
-    
-  step_3_distribute_flex_grow:
-    - "If `totalFlexGrow` > 0, iterate through visible controls."
-    - "For controls with `growFactor` > 0, set their main axis size to: `Round((growFactor / totalFlexGrow) * remainingSpace)`"
-    - "Recalculate `totalUsedSpace` (sum of all control main-axis sizes + `totalGapSpace`)."
-    
-  step_4_apply_justify_content:
-    - "If `totalFlexGrow` == 0 (no items are growing):"
-    - "  - *Stretch*: Divide `availableMainSpace` - `totalGapSpace` equally among items and set their main axis size."
-    - "  - *FlexStart*: Start offset is top/left padding."
-    - "  - *FlexEnd*: Start offset is adjusted by (`availableMainSpace` - `totalUsedSpace`)."
-    - "  - *Center*: Start offset is adjusted by (`availableMainSpace` - `totalUsedSpace`) / 2."
-    - "  - *SpaceBetween*: Recalculate Gap as `Gap + ((availableMainSpace - totalUsedSpace) / numGaps)`."
-    - "  - *SpaceAround*: Recalculate Gap and initial offset based on total items."
-      
-  step_5_apply_positions_and_align_items:
-    - "Iterate through visible controls."
-    - "Determine Cross Axis position (`crossPos`) based on `AlignItems`:"
-    - "  - *FlexStart*: Place at top/left padding."
-    - "  - *FlexEnd*: Place at bottom/right container edge minus padding and control size."
-    - "  - *Center*: Place at middle of available cross space."
-    - "  - *Stretch*: Place at top/left padding and set cross-axis size to `availableCrossSpace`."
-    - "Apply `crossPos` and `currentMainX` (or `currentMainY`) to the control."
-    - "Advance the main axis position by the control's size + gap."
+  engine: "Since 1.2.0 all arithmetic is done by DSFlexEngine.Arrange (DSCore/DSFlexEngine.xojo_code), the layout engine of the Clinic DS spec §8.5, shared with DesktopFlexLayoutManager. ApplyLayout only maps settings and applies results."
+  mapping:
+    - "Visible managed controls, in AddControl order, become DSFlexItem objects; IntrinsicMain / IntrinsicCross = the basis sizes stored by AddControl (BasisWidthMap / BasisHeightMap), so earlier passes never change a control's natural size."
+    - "Grow factor g (Double) -> engine factor Max(1, Floor(g x 1000 + 0.5)); only the ratios matter, so fractional factors keep their meaning."
+    - "Justify FlexStart/FlexEnd/Center/SpaceBetween/SpaceAround/SpaceEvenly -> MainAxisAlignment Start/End_/Center/SpaceBetween/SpaceAround/SpaceEvenly. Justify Stretch -> Start with factor 1 on every item when no control grows."
+    - "Align FlexStart/FlexEnd/Center/Stretch -> CrossAxisAlignment Start/End_/Center/Stretch."
+    - "Results are local to the WebRectangle and assigned as they are, only when a value changed (each change is a browser update)."
+  behaviour_changes_from_1_1_0:
+    - "Edges are rounded with Floor(x + 0.5) instead of Round (whose tie rule depends on the server OS), so adjacent items never leave 1 px gaps."
+    - "When content is larger than the container, alignment uses zero free space: items start at the padding instead of moving to negative positions (FlexEnd), and SpaceBetween / SpaceAround keep Gap. Debug builds log the overflow."
+    - "With free space, SpaceBetween and SpaceAround give the same positions as before (Gap + free / (n - 1) equals the old (available - fixed) / (n - 1))."
+    - "The cross axis uses the basis size too: after Align Stretch is switched off, controls return to their natural size."
+    - "In Align FlexStart/FlexEnd/Center a control bigger than the content area on the cross axis is reduced to the content size."

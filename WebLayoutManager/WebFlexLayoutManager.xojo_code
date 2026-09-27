@@ -31,226 +31,104 @@ Inherits WebRectangle
 
 	#tag Method, Flags = &h0
 		Sub ApplyLayout()
+		  // Collects the visible managed controls, maps this manager's settings to DSFlexEngine
+		  // (the shared layout math, DSCore/DSFlexEngine.xojo_code) and applies the result.
+		  // Same engine as DesktopFlexLayoutManager, so Web and Desktop lay out identically.
 		  If ManagedControls.LastIndex < 0 Then Return
 		  
-		  // Step 1: Gather visible controls and metrics
 		  Var visibleControls() As WebUIControl
-		  Var totalFlexGrow As Double = 0
-		  Var totalFixedSpace As Integer = 0
-		  
 		  For Each c As WebUIControl In ManagedControls
-		    If c.Visible Then
-		      visibleControls.Add(c)
-		      
-		      Var grow As Double = 0
-		      If FlexGrowMap.HasKey(c) Then
-		        grow = FlexGrowMap.Value(c)
-		      End If
-		      
-		      totalFlexGrow = totalFlexGrow + grow
-		      
-		      If grow = 0 Then
-		        If Direction = FlexDirection.Row Then
-		          totalFixedSpace = totalFixedSpace + BasisWidthMap.Value(c).IntegerValue
-		        Else
-		          totalFixedSpace = totalFixedSpace + BasisHeightMap.Value(c).IntegerValue
-		        End If
-		      End If
-		    End If
+		    If c.Visible Then visibleControls.Add(c)
 		  Next
-		  
 		  If visibleControls.LastIndex < 0 Then Return
 		  
-		  // Step 2: Calculate available space
-		  Var availableMainSpace As Integer
-		  Var availableCrossSpace As Integer
+		  Var isRow As Boolean = (Direction = FlexDirection.Row)
+		  Var cfg As New DSFlexConfig
+		  cfg.Direction = If(isRow, DSLayout.Direction.Horizontal, DSLayout.Direction.Vertical)
+		  cfg.Spacing = Gap
+		  cfg.PadTop = PaddingTop
+		  cfg.PadRight = PaddingRight
+		  cfg.PadBottom = PaddingBottom
+		  cfg.PadLeft = PaddingLeft
+		  cfg.Width = Me.Width
+		  cfg.Height = Me.Height
 		  
-		  If Direction = FlexDirection.Row Then
-		    availableMainSpace = Me.Width - PaddingLeft - PaddingRight
-		    availableCrossSpace = Me.Height - PaddingTop - PaddingBottom
+		  Select Case Justify
+		  Case JustifyContent.FlexEnd
+		    cfg.MainAxisAlignment = DSLayout.MainAxisAlignment.End_
+		  Case JustifyContent.Center
+		    cfg.MainAxisAlignment = DSLayout.MainAxisAlignment.Center
+		  Case JustifyContent.SpaceBetween
+		    cfg.MainAxisAlignment = DSLayout.MainAxisAlignment.SpaceBetween
+		  Case JustifyContent.SpaceAround
+		    cfg.MainAxisAlignment = DSLayout.MainAxisAlignment.SpaceAround
+		  Case JustifyContent.SpaceEvenly
+		    cfg.MainAxisAlignment = DSLayout.MainAxisAlignment.SpaceEvenly
+		  Else // FlexStart, and Stretch (handled below with flex factors)
+		    cfg.MainAxisAlignment = DSLayout.MainAxisAlignment.Start
+		  End Select
+		  
+		  Select Case Align
+		  Case AlignItems.FlexEnd
+		    cfg.CrossAxisAlignment = DSLayout.CrossAxisAlignment.End_
+		  Case AlignItems.Center
+		    cfg.CrossAxisAlignment = DSLayout.CrossAxisAlignment.Center
+		  Case AlignItems.Stretch
+		    cfg.CrossAxisAlignment = DSLayout.CrossAxisAlignment.Stretch
 		  Else
-		    availableMainSpace = Me.Height - PaddingTop - PaddingBottom
-		    availableCrossSpace = Me.Width - PaddingLeft - PaddingRight
-		  End If
+		    cfg.CrossAxisAlignment = DSLayout.CrossAxisAlignment.Start
+		  End Select
 		  
-		  If availableMainSpace < 0 Then availableMainSpace = 0
-		  If availableCrossSpace < 0 Then availableCrossSpace = 0
+		  // Intrinsic sizes come from the basis maps (sizes captured by AddControl), never from the
+		  // current size: a previous pass may have grown or stretched the control (fix ba2b05e).
+		  Var items() As DSFlexItem
+		  Var anyGrow As Boolean = False
+		  For Each c As WebUIControl In visibleControls
+		    Var basisW As Integer = BasisWidthMap.Lookup(c, c.Width).IntegerValue
+		    Var basisH As Integer = BasisHeightMap.Lookup(c, c.Height).IntegerValue
+		    Var it As New DSFlexItem
+		    it.IntrinsicMain = If(isRow, basisW, basisH)
+		    it.IntrinsicCross = If(isRow, basisH, basisW)
+		    it.Factor = FactorFor(c)
+		    If it.Factor > 0 Then anyGrow = True
+		    items.Add(it)
+		  Next
 		  
-		  Var totalGapSpace As Integer = 0
-		  If visibleControls.Count > 1 Then
-		    totalGapSpace = (visibleControls.Count - 1) * Gap
-		  End If
-		  Var remainingSpace As Integer = availableMainSpace - totalFixedSpace - totalGapSpace
-		  If remainingSpace < 0 Then remainingSpace = 0
-		  
-		  // Step 3: Calculate main-axis sizes (flex grow distribution)
-		  Var mainSizes() As Integer
-		  Var totalUsedSpace As Integer = totalGapSpace
-		  
-		  If Justify = JustifyContent.Stretch And totalFlexGrow = 0 Then
-		    // Stretch with no flex grow: distribute space equally to all controls
-		    Var stretchSize As Integer = 0
-		    If visibleControls.Count > 0 Then
-		      stretchSize = Round((availableMainSpace - totalGapSpace) / visibleControls.Count)
-		      If stretchSize < 0 Then stretchSize = 0
-		    End If
-		    For Each c As WebUIControl In visibleControls
-		      mainSizes.Add(stretchSize)
-		      totalUsedSpace = totalUsedSpace + stretchSize
+		  // JustifyContent.Stretch (equal sizes, only when nothing grows) = every item flex 1 Tight.
+		  If Justify = JustifyContent.Stretch And Not anyGrow Then
+		    For Each it As DSFlexItem In items
+		      it.Factor = 1
 		    Next
-		  Else
-		    For Each c As WebUIControl In visibleControls
-		      Var size As Integer
-		      Var grow As Double = 0
-		      If FlexGrowMap.HasKey(c) Then
-		        grow = FlexGrowMap.Value(c)
-		      End If
-		      
-		      If grow > 0 And totalFlexGrow > 0 Then
-		        size = Round((grow / totalFlexGrow) * remainingSpace)
-		      Else
-		        If Direction = FlexDirection.Row Then
-		          size = BasisWidthMap.Value(c).IntegerValue
-		        Else
-		          size = BasisHeightMap.Value(c).IntegerValue
-		        End If
-		      End If
-		      
-		      mainSizes.Add(size)
-		      totalUsedSpace = totalUsedSpace + size
-		    Next
 		  End If
 		  
-		  // Step 4: Apply Justify Content (main axis starting position and gap adjustment)
-		  Var currentMainPos As Double
-		  Var actualGap As Double = Gap
+		  Var res As DSFlexResult = DSFlexEngine.Arrange(cfg, items)
 		  
-		  If Justify = JustifyContent.Stretch And totalFlexGrow = 0 Then
-		    // Stretch: already sized in Step 3, just set starting position
-		    If Direction = FlexDirection.Row Then
-		      currentMainPos = PaddingLeft
-		    Else
-		      currentMainPos = PaddingTop
-		    End If
-		  ElseIf totalFlexGrow = 0 Then
-		    Select Case Justify
-		    Case JustifyContent.FlexStart
-		      If Direction = FlexDirection.Row Then
-		        currentMainPos = PaddingLeft
-		      Else
-		        currentMainPos = PaddingTop
-		      End If
-		      
-		    Case JustifyContent.FlexEnd
-		      Var totalItemsAndGaps As Integer = totalFixedSpace + totalGapSpace
-		      Var startOffset As Integer = availableMainSpace - totalItemsAndGaps
-		      If Direction = FlexDirection.Row Then
-		        currentMainPos = PaddingLeft + startOffset
-		      Else
-		        currentMainPos = PaddingTop + startOffset
-		      End If
-		      
-		    Case JustifyContent.Center
-		      Var totalItemsAndGaps As Integer = totalFixedSpace + totalGapSpace
-		      Var startOffset As Double = (availableMainSpace - totalItemsAndGaps) / 2.0
-		      If startOffset < 0 Then startOffset = 0
-		      If Direction = FlexDirection.Row Then
-		        currentMainPos = PaddingLeft + startOffset
-		      Else
-		        currentMainPos = PaddingTop + startOffset
-		      End If
-		      
-		    Case JustifyContent.SpaceBetween
-		      If Direction = FlexDirection.Row Then
-		        currentMainPos = PaddingLeft
-		      Else
-		        currentMainPos = PaddingTop
-		      End If
-		      If visibleControls.Count > 1 Then
-		        actualGap = (availableMainSpace - totalFixedSpace) / (visibleControls.Count - 1)
-		        If actualGap < 0 Then actualGap = 0
-		      End If
-		      
-		    Case JustifyContent.SpaceAround
-		      Var spacePerItem As Double = (availableMainSpace - totalFixedSpace) / visibleControls.Count
-		      If spacePerItem < 0 Then spacePerItem = 0
-		      actualGap = spacePerItem
-		      If Direction = FlexDirection.Row Then
-		        currentMainPos = PaddingLeft + (spacePerItem / 2.0)
-		      Else
-		        currentMainPos = PaddingTop + (spacePerItem / 2.0)
-		      End If
-		    End Select
-		  Else
-		    // Flex grow items fill the space, start at beginning
-		    If Direction = FlexDirection.Row Then
-		      currentMainPos = PaddingLeft
-		    Else
-		      currentMainPos = PaddingTop
-		    End If
-		  End If
-		  
-		  // Step 5: Position each control (main axis + cross axis alignment)
+		  // Web: children of a WebRectangle are positioned relative to it, so the engine's local
+		  // results are used as they are. Assign only what changed (each change is sent to the browser).
 		  For i As Integer = 0 To visibleControls.LastIndex
 		    Var c As WebUIControl = visibleControls(i)
-		    Var mainSize As Integer = mainSizes(i)
-		    Var crossPos As Integer
-		    Var crossSize As Integer
-		    
-		    If Direction = FlexDirection.Row Then
-		      crossSize = c.Height
-		    Else
-		      crossSize = c.Width
-		    End If
-		    
-		    Select Case Align
-		    Case AlignItems.FlexStart
-		      If Direction = FlexDirection.Row Then
-		        crossPos = PaddingTop
-		      Else
-		        crossPos = PaddingLeft
-		      End If
-		      
-		    Case AlignItems.FlexEnd
-		      If Direction = FlexDirection.Row Then
-		        crossPos = Me.Height - PaddingBottom - crossSize
-		      Else
-		        crossPos = Me.Width - PaddingRight - crossSize
-		      End If
-		      
-		    Case AlignItems.Center
-		      If Direction = FlexDirection.Row Then
-		        crossPos = PaddingTop + Round((availableCrossSpace - crossSize) / 2.0)
-		      Else
-		        crossPos = PaddingLeft + Round((availableCrossSpace - crossSize) / 2.0)
-		      End If
-		      
-		    Case AlignItems.Stretch
-		      If Direction = FlexDirection.Row Then
-		        crossPos = PaddingTop
-		        crossSize = availableCrossSpace
-		      Else
-		        crossPos = PaddingLeft
-		        crossSize = availableCrossSpace
-		      End If
-		    End Select
-		    
-		    // Apply position and size to control
-		    If Direction = FlexDirection.Row Then
-		      c.Left = Round(currentMainPos)
-		      c.Top = crossPos
-		      c.Width = mainSize
-		      c.Height = crossSize
-		    Else
-		      c.Left = crossPos
-		      c.Top = Round(currentMainPos)
-		      c.Width = crossSize
-		      c.Height = mainSize
-		    End If
-		    
-		    currentMainPos = currentMainPos + mainSize + actualGap
+		    If c.Left <> res.Lefts(i) Then c.Left = res.Lefts(i)
+		    If c.Top <> res.Tops(i) Then c.Top = res.Tops(i)
+		    If c.Width <> res.Widths(i) Then c.Width = res.Widths(i)
+		    If c.Height <> res.Heights(i) Then c.Height = res.Heights(i)
 		  Next
+		  
+		  #If DebugBuild Then
+		    If res.Overflow Then System.DebugLog("WebFlexLayoutManager " + Me.Name + ": content overflows by " + Str(res.UsedMain - If(isRow, Me.Width - PaddingLeft - PaddingRight, Me.Height - PaddingTop - PaddingBottom)) + " px")
+		  #EndIf
 		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function FactorFor(c As WebUIControl) As Integer
+		  // Grow factors are Doubles in this class but Integers in DSFlexEngine. Scaling by 1000
+		  // keeps the ratios of fractional factors (0.5 : 1.5 = 500 : 1500), so the space
+		  // split is unchanged; the engine only uses the ratios.
+		  If Not FlexGrowMap.HasKey(c) Then Return 0
+		  Var g As Double = FlexGrowMap.Value(c).DoubleValue
+		  If g <= 0 Then Return 0
+		  Return Max(1, Floor(g * 1000 + 0.5))
+		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
@@ -354,7 +232,8 @@ Inherits WebRectangle
 		  Center = 2
 		  SpaceBetween = 3
 		  SpaceAround = 4
-		Stretch = 5
+		  Stretch = 5
+		SpaceEvenly = 6
 	#tag EndEnum
 
 
@@ -655,6 +534,7 @@ Inherits WebRectangle
 				"3 - SpaceBetween"
 				"4 - SpaceAround"
 				"5 - Stretch"
+				"6 - SpaceEvenly"
 			#tag EndEnumValues
 		#tag EndViewProperty
 		#tag ViewProperty
