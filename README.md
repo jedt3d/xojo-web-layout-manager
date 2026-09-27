@@ -107,7 +107,7 @@ Replace `.Justify` and `.Align` in code. Layouts saved with 1.x store `Justify =
 
 ### Main axis / cross axis names (2.0.0)
 - **Breaking**: `Justify` is renamed `MainAxisAlignment` and `Align` is renamed `CrossAxisAlignment` (the Inspector shows "Main Axis Alignment" / "Cross Axis Alignment"). Enum types are unchanged (`JustifyContent`, `AlignItems`). See "Upgrading from 1.x to 2.0".
-- **Added**: property descriptions (code-editor tips) and axis hints in the Inspector drop-downs, for example `0 - FlexStart (Row: left / Column: top)`.
+- **Added**: property descriptions on `Direction`, `MainAxisAlignment`, `CrossAxisAlignment`, `Gap`, `AddControl` and `SetFlexGrow`, shown as tips in the code editor. (Axis hints inside the Inspector drop-down were tried and removed: Xojo 2026r2.1 shows the enum member names and ignores custom item text.)
 - **Docs**: "Main axis and cross axis" section with diagram, tables and the grow-factor rule.
 
 ### DSFlexEngine (1.2.0)

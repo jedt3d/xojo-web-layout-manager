@@ -236,7 +236,7 @@ End If
 
 ### เวอร์ชัน 2.0.0 - ชื่อแกนหลัก / แกนรอง
 - **เปลี่ยนแบบไม่เข้ากันกับของเดิม (Breaking)**: `Justify` เปลี่ยนชื่อเป็น `MainAxisAlignment` และ `Align` เปลี่ยนชื่อเป็น `CrossAxisAlignment` (Inspector แสดง "Main Axis Alignment" / "Cross Axis Alignment") ชนิด enum ไม่เปลี่ยน (`JustifyContent`, `AlignItems`) ดูหัวข้อ "การอัปเกรดจาก 1.x เป็น 2.0"
-- **เพิ่ม**: คำอธิบายคุณสมบัติ (แสดงเป็นคำแนะนำในตัวแก้ไขโค้ด) และคำใบ้ทิศทางในรายการเลือกของ Inspector เช่น `0 - FlexStart (Row: left / Column: top)`
+- **เพิ่ม**: คำอธิบายคุณสมบัติของ `Direction`, `MainAxisAlignment`, `CrossAxisAlignment`, `Gap`, `AddControl` และ `SetFlexGrow` ซึ่งแสดงเป็นคำแนะนำในตัวแก้ไขโค้ด (ได้ลองใส่คำใบ้ทิศทางในรายการเลือกของ Inspector แล้วแต่นำออก เพราะ Xojo 2026r2.1 แสดงเฉพาะชื่อสมาชิกของ enum และไม่ใช้ข้อความที่กำหนดเอง)
 - **เอกสาร**: หัวข้อ "แกนหลักและแกนรอง" พร้อมแผนภาพ ตาราง และหลักการของ grow factor
 
 ### เวอร์ชัน 1.2.0 - DSFlexEngine

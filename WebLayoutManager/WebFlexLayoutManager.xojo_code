@@ -528,13 +528,13 @@ Inherits WebRectangle
 			Type="JustifyContent"
 			EditorType="Enum"
 			#tag EnumValues
-				"0 - FlexStart (Row: left / Column: top)"
-				"1 - FlexEnd (Row: right / Column: bottom)"
+				"0 - FlexStart"
+				"1 - FlexEnd"
 				"2 - Center"
-				"3 - SpaceBetween (ends touch, equal gaps)"
-				"4 - SpaceAround (equal space around each)"
-				"5 - Stretch (equal sizes, no grow)"
-				"6 - SpaceEvenly (equal space everywhere)"
+				"3 - SpaceBetween"
+				"4 - SpaceAround"
+				"5 - Stretch"
+				"6 - SpaceEvenly"
 			#tag EndEnumValues
 		#tag EndViewProperty
 		#tag ViewProperty
@@ -545,10 +545,10 @@ Inherits WebRectangle
 			Type="AlignItems"
 			EditorType="Enum"
 			#tag EnumValues
-				"0 - FlexStart (Row: top / Column: left)"
-				"1 - FlexEnd (Row: bottom / Column: right)"
+				"0 - FlexStart"
+				"1 - FlexEnd"
 				"2 - Center"
-				"3 - Stretch (Row: full height / Column: full width)"
+				"3 - Stretch"
 			#tag EndEnumValues
 		#tag EndViewProperty
 		#tag ViewProperty
