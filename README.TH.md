@@ -26,6 +26,72 @@
 - **การอัปเดตที่ชาญฉลาด**: คำนวณใหม่เฉพาะเมื่อจำเป็นเท่านั้น
 - **ประหยัดหน่วยความจำ**: ใช้ dictionary เพื่อการค้นหาค่า flex-grow factor อย่างรวดเร็ว
 
+## แกนหลักและแกนรอง (Main axis / Cross axis)
+
+คุณสมบัติจัดตำแหน่งทั้งสองตัว **อิงตามทิศทาง (Direction)** ไม่ได้อิงตามแกน x/y ของหน้าจอ:
+
+- **`MainAxisAlignment`** — จัด *ตามทิศ* คือแนวที่ไอเท็มเรียงต่อกัน (CSS `justify-content`, Flutter `mainAxisAlignment`)
+- **`CrossAxisAlignment`** — จัด *ขวางทิศ* คือแนวตั้งฉากกับทิศที่เรียง (CSS `align-items`, Flutter `crossAxisAlignment`)
+
+ดังนั้นเมื่อเปลี่ยน `Direction` จาก Row เป็น Column แกนบนหน้าจอที่แต่ละคุณสมบัติควบคุมจะสลับกัน ซึ่งเป็นพฤติกรรมที่ตั้งใจ
+
+```
+Direction = Row  (items go left -> right)
+
+  MainAxisAlignment:  along the row   --->  left / centre / right, spacing
+  CrossAxisAlignment: across the row   |    top / middle / bottom, stretch height
+                                       v
+  +---------------------------------------+
+  | [A] [B] [C]                           |
+  +---------------------------------------+
+
+Direction = Column  (items go top -> bottom)
+
+  MainAxisAlignment:  along the column   |   top / middle / bottom, spacing
+                                         v
+  CrossAxisAlignment: across the column --->  left / centre / right, stretch width
+  +-----------+
+  | [A]       |
+  | [B]       |
+  | [C]       |
+  +-----------+
+```
+
+(แผนภาพใช้ป้ายภาษาอังกฤษเพื่อให้คอลัมน์ตรงกัน: along = ตามทิศ, across = ขวางทิศ)
+
+| คุณสมบัติ | ค่าที่เลือกได้ | แกน | เมื่อเป็น Row | เมื่อเป็น Column |
+|---|---|---|---|---|
+| `Direction` | `FlexDirection`: Row, Column | กำหนดแกนหลัก | เรียงซ้าย → ขวา | เรียงบน → ล่าง |
+| `MainAxisAlignment` | `JustifyContent`: FlexStart, FlexEnd, Center, SpaceBetween, SpaceAround, Stretch, SpaceEvenly | แกนหลัก (ตามทิศ) | แนวนอน | แนวตั้ง |
+| `CrossAxisAlignment` | `AlignItems`: FlexStart, FlexEnd, Center, Stretch | แกนรอง (ขวางทิศ) | แนวตั้ง | แนวนอน |
+| grow factor (`AddControl(c, grow)`, `SetFlexGrow`) | Double, 0 = ไม่ขยาย | แกนหลัก | ส่วนแบ่งความกว้างที่เหลือ | ส่วนแบ่งความสูงที่เหลือ |
+
+| ค่า | `MainAxisAlignment` ใน Row / Column | `CrossAxisAlignment` ใน Row / Column |
+|---|---|---|
+| FlexStart | ชิดซ้าย / ชิดบน | ชิดบน / ชิดซ้าย |
+| FlexEnd | ชิดขวา / ชิดล่าง | ชิดล่าง / ชิดขวา |
+| Center | กึ่งกลางแนวนอน / แนวตั้ง | กึ่งกลางแนวตั้ง / แนวนอน |
+| SpaceBetween | ตัวแรกและตัวสุดท้ายชิดขอบ ระยะห่างระหว่างกันเท่ากัน | — |
+| SpaceAround | ระยะรอบแต่ละตัวเท่ากัน (ที่ขอบได้ครึ่งหนึ่ง) | — |
+| SpaceEvenly | ระยะก่อน ระหว่าง และหลังเท่ากันทั้งหมด | — |
+| Stretch | ทุกตัวขนาดเท่ากัน (เฉพาะเมื่อไม่มีตัวใด grow) | เต็มความสูง / เต็มความกว้าง |
+
+### Grow factor: "ขอส่วนแบ่งพื้นที่ที่เหลือ"
+
+- **Grow = 0** (ค่าเริ่มต้น): ตัวควบคุมคงขนาดของตัวเองบนแกนหลัก และ `MainAxisAlignment` เป็นตัวเลื่อนตำแหน่ง
+- **Grow > 0**: ตัวควบคุมได้ส่วนแบ่งของพื้นที่ที่เหลือหลังหักตัวควบคุมขนาดคงที่และ gap ความกว้าง (Row) หรือความสูง (Column) เดิมของมันจะไม่ถูกใช้ ส่วนแบ่งเป็นสัดส่วน เช่น 1 : 2 : 3 ได้ 1/6, 2/6 และ 3/6
+- ถ้า **ทุกตัว** grow จะไม่มีพื้นที่ว่างเหลือ `MainAxisAlignment` จึงไม่มีผลให้เห็น ซึ่งเป็นพฤติกรรมปกติของ flexbox (CSS `flex-grow`, Flutter `Expanded`)
+- ถ้าต้องการให้คงขนาดเดิม ให้เพิ่มโดยไม่ระบุ factor: `AddControl(Button1)` หรือ `SetFlexGrow(Button1, 0)`
+
+## การอัปเกรดจาก 1.x เป็น 2.0
+
+| 1.x | 2.0 | ชนิด (ไม่เปลี่ยน) |
+|---|---|---|
+| `Justify` | `MainAxisAlignment` | `JustifyContent` |
+| `Align` | `CrossAxisAlignment` | `AlignItems` |
+
+แก้ `.Justify` และ `.Align` ในโค้ด เลย์เอาต์ที่บันทึกด้วย 1.x เก็บค่าเป็น `Justify = n` / `Align = n` ให้ตั้งค่าทั้งสองใหม่ใน Inspector หลังอัปเกรด (หรือแก้ในไฟล์โปรเจกต์แบบข้อความ เปลี่ยนสองบรรทัดนั้นเป็น `MainAxisAlignment = n` / `CrossAxisAlignment = n`)
+
 ## เริ่มต้นใช้งานด่วน
 
 ```xojo
@@ -38,8 +104,8 @@ layoutManager.Height = 100
 
 // กำหนดค่าคุณสมบัติของเลย์เอาต์
 layoutManager.Direction = FlexDirection.Row
-layoutManager.Justify = JustifyContent.SpaceBetween
-layoutManager.Align = AlignItems.Center
+layoutManager.MainAxisAlignment = JustifyContent.SpaceBetween
+layoutManager.CrossAxisAlignment = AlignItems.Center
 layoutManager.Gap = 10
 layoutManager.PaddingLeft = 20
 layoutManager.PaddingRight = 20
@@ -63,8 +129,8 @@ AddHandler Self.Resized, Sub() layoutManager.ApplyLayout()
 DesktopFlexLayoutManager
 ├── Properties (คุณสมบัติ)
 │   ├── Direction (FlexDirection)
-│   ├── Justify (JustifyContent)
-│   ├── Align (AlignItems)
+│   ├── MainAxisAlignment (JustifyContent)
+│   ├── CrossAxisAlignment (AlignItems)
 │   ├── Gap (Integer)
 │   └── Padding* (Integer)
 ├── Methods (เมธอด)
@@ -82,7 +148,7 @@ DesktopFlexLayoutManager
 ตั้งแต่เวอร์ชัน 1.2.0 การคำนวณทั้งหมดอยู่ใน **`DSFlexEngine`** (โฟลเดอร์ `DSCore/`) ซึ่งใช้ร่วมกับเวอร์ชัน Desktop เมธอด `ApplyLayout()` ทำงาน 4 ขั้นตอน:
 
 1. **รวบรวม (Collect)**: รวบรวมตัวควบคุมที่มองเห็นได้และขนาด basis ที่เก็บไว้ตอน `AddControl()`
-2. **แปลงค่า (Map)**: แปลง Direction / Justify / Align / Gap / Padding / grow factor เป็น `DSFlexConfig` และรายการ `DSFlexItem`
+2. **แปลงค่า (Map)**: แปลง Direction / MainAxisAlignment / CrossAxisAlignment / Gap / Padding / grow factor เป็น `DSFlexConfig` และรายการ `DSFlexItem`
 3. **คำนวณ (Arrange)**: เรียก `DSFlexEngine.Arrange` (กระจาย flex, จัดแนว, ปัดขอบด้วย `Floor(x + 0.5)`, ตรวจจับ overflow)
 4. **นำไปใช้ (Apply)**: กำหนดตำแหน่งภายใน WebRectangle เฉพาะค่าที่เปลี่ยน
 
@@ -91,8 +157,8 @@ DesktopFlexLayoutManager
 ### แถบนำทางแนวนอน
 ```xojo
 navLayout.Direction = FlexDirection.Row
-navLayout.Justify = JustifyContent.SpaceBetween
-navLayout.Align = AlignItems.Center
+navLayout.MainAxisAlignment = JustifyContent.SpaceBetween
+navLayout.CrossAxisAlignment = AlignItems.Center
 navLayout.AddControl(homeButton, 0)
 navLayout.AddControl(searchField, 1)  // ขยายเพื่อเติมเต็มพื้นที่ว่าง
 navLayout.AddControl(userMenu, 0)
@@ -101,8 +167,8 @@ navLayout.AddControl(userMenu, 0)
 ### แผงการตั้งค่าแนวตั้ง
 ```xojo
 settingsLayout.Direction = FlexDirection.Column
-settingsLayout.Justify = JustifyContent.FlexStart
-settingsLayout.Align = AlignItems.Stretch
+settingsLayout.MainAxisAlignment = JustifyContent.FlexStart
+settingsLayout.CrossAxisAlignment = AlignItems.Stretch
 settingsLayout.AddControl(titleSection, 0)
 settingsLayout.AddControl(optionsGroup, 1)  // ขยายในแนวตั้ง
 settingsLayout.AddControl(buttonBar, 0)
@@ -168,13 +234,18 @@ End If
 **✅ วิธีแก้ไข:**
 - เพิ่มกลไก flex-basis (`BasisWidthMap` และ `BasisHeightMap`) ที่เก็บขนาด Width และ Height ดั้งเดิมของตัวควบคุมเมื่อถูกเพิ่มผ่าน `AddControl()` อัลกอริทึมเลย์เอาต์จะใช้ค่า basis ที่เก็บไว้แทนค่า `c.Width`/`c.Height` ปัจจุบันเมื่อคำนวณพื้นที่คงที่สำหรับตัวควบคุม grow=0
 
+### เวอร์ชัน 2.0.0 - ชื่อแกนหลัก / แกนรอง
+- **เปลี่ยนแบบไม่เข้ากันกับของเดิม (Breaking)**: `Justify` เปลี่ยนชื่อเป็น `MainAxisAlignment` และ `Align` เปลี่ยนชื่อเป็น `CrossAxisAlignment` (Inspector แสดง "Main Axis Alignment" / "Cross Axis Alignment") ชนิด enum ไม่เปลี่ยน (`JustifyContent`, `AlignItems`) ดูหัวข้อ "การอัปเกรดจาก 1.x เป็น 2.0"
+- **เพิ่ม**: คำอธิบายคุณสมบัติ (แสดงเป็นคำแนะนำในตัวแก้ไขโค้ด) และคำใบ้ทิศทางในรายการเลือกของ Inspector เช่น `0 - FlexStart (Row: left / Column: top)`
+- **เอกสาร**: หัวข้อ "แกนหลักและแกนรอง" พร้อมแผนภาพ ตาราง และหลักการของ grow factor
+
 ### เวอร์ชัน 1.2.0 - DSFlexEngine
 **✅ การเปลี่ยนแปลง:**
 - `ApplyLayout()` ส่งการคำนวณทั้งหมดให้ `DSFlexEngine` (`DSCore/`) ซึ่งเป็นเอนจินเลย์เอาต์ตามสเปก Clinic DS §8.5 และใช้ร่วมกับ `DesktopFlexLayoutManager` API สาธารณะและกลไก flex-basis ไม่เปลี่ยน
 - เพิ่ม `JustifyContent.SpaceEvenly` (ค่า 6 ค่าเดิมทั้งหมดความหมายคงเดิม)
 - ปัดขอบทุกด้านด้วย `Floor(x + 0.5)` แทน `Round` (ซึ่งผลลัพธ์กรณี .5 ขึ้นกับระบบปฏิบัติการของเซิร์ฟเวอร์)
 - เมื่อเนื้อหาใหญ่กว่าคอนเทนเนอร์ ตัวควบคุมเริ่มที่ padding แทนพิกัดติดลบ และ SpaceBetween / SpaceAround ยังคงเว้น Gap
-- แกนรองใช้ขนาด basis ด้วย เมื่อเลิกใช้ Align Stretch ตัวควบคุมจะกลับเป็นขนาดเดิม
+- แกนรองใช้ขนาด basis ด้วย เมื่อเลิกใช้ CrossAxisAlignment Stretch ตัวควบคุมจะกลับเป็นขนาดเดิม
 
 ### ปัญหาที่ทราบและสิ่งที่พิจารณาในอนาคต
 - **ความแม่นยำของจุดทศนิยม (Floating Point Precision)**: แก้ไขแล้วในเวอร์ชัน 1.2.0 (ปัดขอบด้วย `Floor(x + 0.5)`)

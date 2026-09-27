@@ -46,8 +46,8 @@ classDiagram
     }
     class WebFlexLayoutManager {
         +Direction: FlexDirection
-        +Justify: JustifyContent
-        +Align: AlignItems
+        +MainAxisAlignment: JustifyContent
+        +CrossAxisAlignment: AlignItems
         +Gap: Integer
         +PaddingLeft: Integer
         +PaddingTop: Integer
@@ -122,7 +122,7 @@ sequenceDiagram
     participant C as WebUIControl (Child)
     
     User->>W: 1. Instantiate or Place on Page
-    User->>W: 2. Set Properties (Direction, Justify, Align, Gap)
+    User->>W: 2. Set Properties (Direction, MainAxisAlignment, CrossAxisAlignment, Gap)
     User->>W: 3. AddControl(ControlA, 1.0)
     W->>W: ApplyLayout() (Calculates & positions)
     W->>C: Set Left, Top, Width, Height
@@ -269,10 +269,10 @@ Controls with a `growFactor > 0` are resized to take a fraction of `remainingSpa
 ```
 
 ### Step 4: Apply Justify Content
-If no items are meant to grow (`totalFlexGrow = 0`), the layout engine determines where the first item starts and how gaps are distributed based on the `Justify` enum setting. 
+If no items are meant to grow (`totalFlexGrow = 0`), the layout engine determines where the first item starts and how gaps are distributed based on the `MainAxisAlignment` enum setting. 
 
 ```vb
-  Select Case Justify
+  Select Case MainAxisAlignment
   Case JustifyContent.Center
     Var totalItemsAndGaps As Integer = totalFixedSpace + totalGapSpace
     Var startOffset As Double = (availableMainSpace - totalItemsAndGaps) / 2.0
@@ -294,7 +294,7 @@ If no items are meant to grow (`totalFlexGrow = 0`), the layout engine determine
 ```
 
 ### Step 5: Position each control
-Finally, the cross-axis coordinates are determined using the `Align` setting. The Xojo control properties (`Left`, `Top`, `Width`, `Height`) are updated explicitly, and the loop advances to position the next control.
+Finally, the cross-axis coordinates are determined using the `CrossAxisAlignment` setting. The Xojo control properties (`Left`, `Top`, `Width`, `Height`) are updated explicitly, and the loop advances to position the next control.
 
 ```vb
   For i As Integer = 0 To visibleControls.LastIndex
@@ -304,7 +304,7 @@ Finally, the cross-axis coordinates are determined using the `Align` setting. Th
     Var crossSize As Integer
     
     // Example: cross-axis calculation for Center alignment
-    If Align = AlignItems.Center Then
+    If CrossAxisAlignment = AlignItems.Center Then
       If Direction = FlexDirection.Row Then
         crossPos = PaddingTop + Round((availableCrossSpace - crossSize) / 2.0)
       Else
@@ -359,7 +359,7 @@ FlexManager2.AddControl(StatusLabel, 0)
 // [StatusLabel]
 ```
 
-#### `Justify` (JustifyContent)
+#### `MainAxisAlignment` (JustifyContent)
 Controls how items are distributed along the main axis (horizontal for Row, vertical for Column).
 
 ```vb
@@ -369,31 +369,31 @@ FlexManager.AddControl(Btn2, 0)
 FlexManager.AddControl(Btn3, 0)
 
 // FlexStart (default): Items packed at the start
-FlexManager.Justify = JustifyContent.FlexStart
+FlexManager.MainAxisAlignment = JustifyContent.FlexStart
 // [Btn1][Btn2][Btn3]                       (space on right)
 
 // FlexEnd: Items packed at the end
-FlexManager.Justify = JustifyContent.FlexEnd
+FlexManager.MainAxisAlignment = JustifyContent.FlexEnd
 //                     [Btn1][Btn2][Btn3]   (space on left)
 
 // Center: Items centered
-FlexManager.Justify = JustifyContent.Center
+FlexManager.MainAxisAlignment = JustifyContent.Center
 //          [Btn1][Btn2][Btn3]              (space on both sides)
 
 // SpaceBetween: First at start, last at end, equal space between
-FlexManager.Justify = JustifyContent.SpaceBetween
+FlexManager.MainAxisAlignment = JustifyContent.SpaceBetween
 // [Btn1]        [Btn2]        [Btn3]
 
 // SpaceAround: Equal space around each item
-FlexManager.Justify = JustifyContent.SpaceAround
+FlexManager.MainAxisAlignment = JustifyContent.SpaceAround
 //   [Btn1]   [Btn2]   [Btn3]
 
 // Stretch: Items resized equally to fill space (when no FlexGrow)
-FlexManager.Justify = JustifyContent.Stretch
+FlexManager.MainAxisAlignment = JustifyContent.Stretch
 // [=====Btn1=====][=====Btn2=====][=====Btn3=====]
 ```
 
-#### `Align` (AlignItems)
+#### `CrossAxisAlignment` (AlignItems)
 Controls how items are aligned on the cross axis (perpendicular to main axis).
 
 ```vb
@@ -403,7 +403,7 @@ FlexManager.AddControl(SmallBtn, 0)   // 30px height
 FlexManager.AddControl(BigBtn, 0)     // 60px height
 
 // FlexStart: Align to top
-FlexManager.Align = AlignItems.FlexStart
+FlexManager.CrossAxisAlignment = AlignItems.FlexStart
 // SmallBtn at top, BigBtn at top
 // ┌───────────┐
 // │[Btn] [Btn]│
@@ -412,7 +412,7 @@ FlexManager.Align = AlignItems.FlexStart
 // └───────────┘
 
 // FlexEnd: Align to bottom
-FlexManager.Align = AlignItems.FlexEnd
+FlexManager.CrossAxisAlignment = AlignItems.FlexEnd
 // SmallBtn at bottom, BigBtn at bottom
 // ┌────────────┐
 // │            │
@@ -421,7 +421,7 @@ FlexManager.Align = AlignItems.FlexEnd
 // └────────────┘
 
 // Center: Vertically centered
-FlexManager.Align = AlignItems.Center
+FlexManager.CrossAxisAlignment = AlignItems.Center
 // Both buttons centered vertically
 // ┌────────────┐
 // │            │
@@ -431,7 +431,7 @@ FlexManager.Align = AlignItems.Center
 // └────────────┘
 
 // Stretch: Items stretched to fill height
-FlexManager.Align = AlignItems.Stretch
+FlexManager.CrossAxisAlignment = AlignItems.Stretch
 // SmallBtn becomes 100px height, BigBtn becomes 100px height
 // ┌────────────┐
 // │[          ]│
@@ -661,8 +661,8 @@ End Sub
 Sub Opening()
   // Configure horizontal layout
   NavBar.Direction = FlexDirection.Row
-  NavBar.Justify = JustifyContent.FlexStart
-  NavBar.Align = AlignItems.Center
+  NavBar.MainAxisAlignment = JustifyContent.FlexStart
+  NavBar.CrossAxisAlignment = AlignItems.Center
   NavBar.Gap = 15
   NavBar.PaddingLeft = 20
   NavBar.PaddingRight = 20
@@ -699,8 +699,8 @@ End Sub
 // Horizontal row of equal-width cards
 Sub Opening()
   CardsLayout.Direction = FlexDirection.Row
-  CardsLayout.Justify = JustifyContent.SpaceBetween
-  CardsLayout.Align = AlignItems.Stretch
+  CardsLayout.MainAxisAlignment = JustifyContent.SpaceBetween
+  CardsLayout.CrossAxisAlignment = AlignItems.Stretch
   CardsLayout.Gap = 20
   CardsLayout.PaddingLeft = 20
   CardsLayout.PaddingRight = 20
@@ -770,7 +770,7 @@ Sub Opening()
   FormLayout.Gap = 10
   FormLayout.PaddingLeft = 20
   FormLayout.PaddingRight = 20
-  FormLayout.Align = AlignItems.Stretch  // Fields stretch to full width
+  FormLayout.CrossAxisAlignment = AlignItems.Stretch  // Fields stretch to full width
   
   // Label (fixed height)
   FormLayout.AddControl(lblName, 0)
@@ -808,7 +808,7 @@ End Sub
 ```vb
 Sub Opening()
   MainLayout.Direction = FlexDirection.Column
-  MainLayout.Align = AlignItems.Stretch
+  MainLayout.CrossAxisAlignment = AlignItems.Stretch
   
   // Header - fixed 60px
   Header.Height = 60
@@ -830,8 +830,8 @@ End Sub
 ```vb
 Sub Opening()
   DialogLayout.Direction = FlexDirection.Column
-  DialogLayout.Justify = JustifyContent.Center  // Center vertically
-  DialogLayout.Align = AlignItems.Center         // Center horizontally
+  DialogLayout.MainAxisAlignment = JustifyContent.Center  // Center vertically
+  DialogLayout.CrossAxisAlignment = AlignItems.Center         // Center horizontally
   DialogLayout.Gap = 20
   
   DialogLayout.AddControl(IconImage, 0)
@@ -847,8 +847,8 @@ End Sub
 ```vb
 Sub Opening()
   ToolbarLayout.Direction = FlexDirection.Row
-  ToolbarLayout.Justify = JustifyContent.FlexStart
-  ToolbarLayout.Align = AlignItems.Center
+  ToolbarLayout.MainAxisAlignment = JustifyContent.FlexStart
+  ToolbarLayout.CrossAxisAlignment = AlignItems.Center
   ToolbarLayout.Gap = 8
   ToolbarLayout.PaddingLeft = 10
   ToolbarLayout.PaddingRight = 10
@@ -987,7 +987,7 @@ The `WebFlexLayoutManager` simplifies responsive UI development by:
 4. **Supporting modern layout patterns** - Flexbox concepts developers already know from web development
 
 Remember the three key steps:
-1. **Configure** - Set Direction, Justify, Align, Gap, Padding properties
+1. **Configure** - Set Direction, MainAxisAlignment, CrossAxisAlignment, Gap, Padding properties
 2. **Add Controls** - Use `AddControl()` with appropriate `growFactor` values
 3. **Apply** - Call `ApplyLayout()` in `Opening` and `Resized` events
 

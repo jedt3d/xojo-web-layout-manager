@@ -1,7 +1,7 @@
 name: FlexLayoutManager
 description: A layout manager class that implements a subset of CSS Flexbox for UI controls.
 target_platform: Xojo Web (ported from Xojo Desktop)
-version: 1.2.0
+version: 2.0.0
 
 enums:
   FlexDirection:
@@ -60,10 +60,10 @@ properties:
     - name: Direction
       type: FlexDirection
       default: Row
-    - name: Justify
+    - name: MainAxisAlignment
       type: JustifyContent
       default: FlexStart
-    - name: Align
+    - name: CrossAxisAlignment
       type: AlignItems
       default: FlexStart
     - name: Gap
@@ -116,12 +116,12 @@ layout_algorithm:
   mapping:
     - "Visible managed controls, in AddControl order, become DSFlexItem objects; IntrinsicMain / IntrinsicCross = the basis sizes stored by AddControl (BasisWidthMap / BasisHeightMap), so earlier passes never change a control's natural size."
     - "Grow factor g (Double) -> engine factor Max(1, Floor(g x 1000 + 0.5)); only the ratios matter, so fractional factors keep their meaning."
-    - "Justify FlexStart/FlexEnd/Center/SpaceBetween/SpaceAround/SpaceEvenly -> MainAxisAlignment Start/End_/Center/SpaceBetween/SpaceAround/SpaceEvenly. Justify Stretch -> Start with factor 1 on every item when no control grows."
-    - "Align FlexStart/FlexEnd/Center/Stretch -> CrossAxisAlignment Start/End_/Center/Stretch."
+    - "MainAxisAlignment FlexStart/FlexEnd/Center/SpaceBetween/SpaceAround/SpaceEvenly -> MainAxisAlignment Start/End_/Center/SpaceBetween/SpaceAround/SpaceEvenly. MainAxisAlignment Stretch -> Start with factor 1 on every item when no control grows."
+    - "CrossAxisAlignment FlexStart/FlexEnd/Center/Stretch -> CrossAxisAlignment Start/End_/Center/Stretch."
     - "Results are local to the WebRectangle and assigned as they are, only when a value changed (each change is a browser update)."
   behaviour_changes_from_1_1_0:
     - "Edges are rounded with Floor(x + 0.5) instead of Round (whose tie rule depends on the server OS), so adjacent items never leave 1 px gaps."
     - "When content is larger than the container, alignment uses zero free space: items start at the padding instead of moving to negative positions (FlexEnd), and SpaceBetween / SpaceAround keep Gap. Debug builds log the overflow."
     - "With free space, SpaceBetween and SpaceAround give the same positions as before (Gap + free / (n - 1) equals the old (available - fixed) / (n - 1))."
-    - "The cross axis uses the basis size too: after Align Stretch is switched off, controls return to their natural size."
-    - "In Align FlexStart/FlexEnd/Center a control bigger than the content area on the cross axis is reduced to the content size."
+    - "The cross axis uses the basis size too: after CrossAxisAlignment Stretch is switched off, controls return to their natural size."
+    - "In CrossAxisAlignment FlexStart/FlexEnd/Center a control bigger than the content area on the cross axis is reduced to the content size."

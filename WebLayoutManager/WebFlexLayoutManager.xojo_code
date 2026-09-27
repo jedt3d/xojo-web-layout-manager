@@ -14,7 +14,7 @@ Inherits WebRectangle
 	#tag EndEvent
 
 
-	#tag Method, Flags = &h0
+	#tag Method, Flags = &h0, Description = 41646473206120636F6E74726F6C2E2067726F77466163746F722030202864656661756C7429206B65657073206974732073697A65206F6E20746865206D61696E20617869733B203E20302074616B65732061207368617265206F6620746865206C6566746F7665722073706163652028313A323A33203D20312F362C20322F362C20332F362920616E6420697473206F776E2077696474682028526F7729206F72206865696768742028436F6C756D6E292069732069676E6F7265642E
 		Sub AddControl(c As WebUIControl, growFactor As Double = 0)
 		  If c = Nil Then Return
 
@@ -53,7 +53,7 @@ Inherits WebRectangle
 		  cfg.Width = Me.Width
 		  cfg.Height = Me.Height
 		  
-		  Select Case Justify
+		  Select Case MainAxisAlignment
 		  Case JustifyContent.FlexEnd
 		    cfg.MainAxisAlignment = DSLayout.MainAxisAlignment.End_
 		  Case JustifyContent.Center
@@ -68,7 +68,7 @@ Inherits WebRectangle
 		    cfg.MainAxisAlignment = DSLayout.MainAxisAlignment.Start
 		  End Select
 		  
-		  Select Case Align
+		  Select Case CrossAxisAlignment
 		  Case AlignItems.FlexEnd
 		    cfg.CrossAxisAlignment = DSLayout.CrossAxisAlignment.End_
 		  Case AlignItems.Center
@@ -94,8 +94,8 @@ Inherits WebRectangle
 		    items.Add(it)
 		  Next
 		  
-		  // JustifyContent.Stretch (equal sizes, only when nothing grows) = every item flex 1 Tight.
-		  If Justify = JustifyContent.Stretch And Not anyGrow Then
+		  // MainAxisAlignment = Stretch (equal sizes, only when nothing grows) = every item flex 1 Tight.
+		  If MainAxisAlignment = JustifyContent.Stretch And Not anyGrow Then
 		    For Each it As DSFlexItem In items
 		      it.Factor = 1
 		    Next
@@ -152,7 +152,7 @@ Inherits WebRectangle
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h0
+	#tag Method, Flags = &h0, Description = 4368616E676573207468652067726F7720666163746F723A2030203D206B656570206F776E2073697A65206F6E20746865206D61696E20617869733B203E2030203D207368617265206F6620746865206C6566746F7665722073706163652E
 		Sub SetFlexGrow(c As WebUIControl, growFactor As Double)
 		  If c = Nil Then Return
 		  
@@ -165,11 +165,11 @@ Inherits WebRectangle
 	#tag EndMethod
 
 
-	#tag Property, Flags = &h0
-		Align As AlignItems = AlignItems.FlexStart
+	#tag Property, Flags = &h0, Description = 416C69676E6D656E74204143524F53532074686520646972656374696F6E202843535320616C69676E2D6974656D73292E20526F773A20766572746963616C202853747265746368203D2066756C6C20686569676874292E20436F6C756D6E3A20686F72697A6F6E74616C202853747265746368203D2066756C6C207769647468292E
+		CrossAxisAlignment As AlignItems = AlignItems.FlexStart
 	#tag EndProperty
 
-	#tag Property, Flags = &h0
+	#tag Property, Flags = &h0, Description = 446972656374696F6E206F6620746865206D61696E20617869733A20526F77203D206974656D73206C65667420746F2072696768742C20436F6C756D6E203D206974656D7320746F7020746F20626F74746F6D2E204D61696E41786973416C69676E6D656E7420776F726B7320616C6F6E672069742C2043726F737341786973416C69676E6D656E74206163726F73732069742E
 		Direction As FlexDirection = FlexDirection.Row
 	#tag EndProperty
 
@@ -185,12 +185,12 @@ Inherits WebRectangle
 		Protected FlexGrowMap As Dictionary
 	#tag EndProperty
 
-	#tag Property, Flags = &h0
+	#tag Property, Flags = &h0, Description = 537061636520696E20706978656C73206265747765656E206E65696768626F7572696E672076697369626C6520636F6E74726F6C732C20616C6F6E6720746865206D61696E20617869732E
 		Gap As Integer = 0
 	#tag EndProperty
 
-	#tag Property, Flags = &h0
-		Justify As JustifyContent = JustifyContent.FlexStart
+	#tag Property, Flags = &h0, Description = 416C69676E6D656E7420414C4F4E472074686520646972656374696F6E2028435353206A7573746966792D636F6E74656E74292E20526F773A20686F72697A6F6E74616C2E20436F6C756D6E3A20766572746963616C2E204E6F2076697369626C6520656666656374207768656E20657665727920636F6E74726F6C2068617320612067726F7720666163746F72203E20302028746865792074616B6520616C6C2066726565207370616365292E
+		MainAxisAlignment As JustifyContent = JustifyContent.FlexStart
 	#tag EndProperty
 
 	#tag Property, Flags = &h1
@@ -521,34 +521,34 @@ Inherits WebRectangle
 			#tag EndEnumValues
 		#tag EndViewProperty
 		#tag ViewProperty
-			Name="Justify"
+			Name="MainAxisAlignment"
 			Visible=true
 			Group="Behavior"
 			InitialValue="0"
 			Type="JustifyContent"
 			EditorType="Enum"
 			#tag EnumValues
-				"0 - FlexStart"
-				"1 - FlexEnd"
+				"0 - FlexStart (Row: left / Column: top)"
+				"1 - FlexEnd (Row: right / Column: bottom)"
 				"2 - Center"
-				"3 - SpaceBetween"
-				"4 - SpaceAround"
-				"5 - Stretch"
-				"6 - SpaceEvenly"
+				"3 - SpaceBetween (ends touch, equal gaps)"
+				"4 - SpaceAround (equal space around each)"
+				"5 - Stretch (equal sizes, no grow)"
+				"6 - SpaceEvenly (equal space everywhere)"
 			#tag EndEnumValues
 		#tag EndViewProperty
 		#tag ViewProperty
-			Name="Align"
+			Name="CrossAxisAlignment"
 			Visible=true
 			Group="Behavior"
 			InitialValue="0"
 			Type="AlignItems"
 			EditorType="Enum"
 			#tag EnumValues
-				"0 - FlexStart"
-				"1 - FlexEnd"
+				"0 - FlexStart (Row: top / Column: left)"
+				"1 - FlexEnd (Row: bottom / Column: right)"
 				"2 - Center"
-				"3 - Stretch"
+				"3 - Stretch (Row: full height / Column: full width)"
 			#tag EndEnumValues
 		#tag EndViewProperty
 		#tag ViewProperty
